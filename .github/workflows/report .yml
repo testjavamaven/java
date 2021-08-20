@@ -1,0 +1,69 @@
+name: report test
+on:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+
+      # Set java version and distribution
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      # Cache dependencies
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      # Build project
+      - name: Build
+        run: mvn -T 1C -e -q clean package -DskipTests
+
+      # Run project Test
+      - name: Unit Test
+        run: mvn -T 1C -e -q test
+
+     # Publish surefire reports to PR (release v1.0.12 of 14/06/21)
+
+      - name: Integration test
+        run: mvn -T 1C -e -q verify
+
+        
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          check_run_annotations: skipped tests
+#            files: test-results/**/*.xml
+
+      # Run project integration test
+
+      - name: Setup sonarqube
+        uses: warchant/setup-sonar-scanner@v3
+      - name: Run sonarqube
+        run: sonar-scanner
+         -Dsonar.login="hadhemiGH@github"
+         -Dsonae.passwors="hathemi123"
+         -Dsonar.host.url="https://sonarqube.airvantage.io/"
+
+# jobs:
+#   build:
+#     name: Build and Run Tests
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v1
+#       - name: Build and Run Tests
+#         run: mvn test --batch-mode --fail-at-end
+#       - name: Publish Test Report
+#         if: ${{ always() }}
+#         uses: scacap/action-surefire-report@v1
