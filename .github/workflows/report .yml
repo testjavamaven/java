@@ -52,7 +52,6 @@ jobs:
       - name: Run sonarqube
         run: sonar-scanner
          -Dsonar.login="hadhemiGH@github"
-         -Dsonae.passwors="hathemi123"
          -Dsonar.host.url="https://sonarqube.airvantage.io/"
 
 # jobs:
