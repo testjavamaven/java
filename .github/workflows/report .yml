@@ -36,6 +36,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=testjavamaven_java
       # Build project
+      - name: Run sonarqube
+        run: mvn sonar:sonar  -Dsonar.projectKey=test  -Dsonar.host.url=http://127.0.0.1:9000  -Dsonar.login=3ea78365bea5ef9e04ae1238ac459842cb917e12
+
       - name: Build
         run: mvn -T 1C -e -q clean package -DskipTests
 
@@ -60,11 +63,7 @@ jobs:
 
 #       - name: Setup sonarqube
 #         uses: warchant/setup-sonar-scanner@v3
-#       - name: Run sonarqube
-#         run: sonar-scanner
-#          -Dsonar.login="hadhemiGH@github"
-#          -Dsonar.host.url="https://sonarqube.airvantage.io/"
-
+     
 # jobs:
 #   build:
 #     name: Build and Run Tests
